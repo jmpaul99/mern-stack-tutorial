@@ -2,32 +2,10 @@ import React, { Component } from "react";
 // This will require to npm install axios
 import axios from 'axios';
 import { Link } from "react-router-dom";
-import { Table, Drawer, Button } from 'antd';
+import { Table, Drawer, Button, Space } from 'antd';
+import {EditFilled, DeleteFilled} from '@ant-design/icons';
+import { red } from '@ant-design/colors';
 import Create from "./create"
-
-const columns = [
-  {
-    title: "Name",
-    dataIndex: "person_name",
-    sorter: (a,b) => a.person_name.length - b.person_name.length, sortDirection: ['descend']
-  },
-  {
-    title: "Position",
-    dataIndex: "person_position",
-    sorter: (a,b) => a.person_position.length - b.person_position.length, sortDirection: ['descend'],
-    responsive: ['md']
-  },
-  {
-    title: "Job Level",
-    dataIndex: "person_level",
-    sorter: (a,b) => a.person_level.length - b.person_level.length, sortDirection: ['descend'],
-    responsive: ['md']
-  },
-  {
-    title: "",
-    dataIndex: "options"
-  }
-];
 
 export default class RecordList extends Component {
   // This is the constructor that shall store our data retrieved from the database
@@ -37,14 +15,43 @@ export default class RecordList extends Component {
     this.showDrawer = this.showDrawer.bind(this);
     this.onClose = this.onClose.bind(this);
     this.state = {
-      records: [], 
+      records: [],
       setVisible: false,
+      columns: [
+        {
+          title: "Name",
+          dataIndex: "person_name",
+          sorter: (a, b) => a.person_name.localeCompare(b.person_name), sortDirection: ['ascend']
+        },
+        {
+          title: "Position",
+          dataIndex: "person_position",
+          sorter: (a, b) => a.person_position.localeCompare(b.person_position), sortDirection: ['descend'],
+          responsive: ['md']
+        },
+        {
+          title: "Job Level",
+          dataIndex: "person_level",
+          sorter: (a, b) => a.person_level.localeCompare(b.person_level), sortDirection: ['descend'],
+          responsive: ['md']
+        },
+        {
+          title: "",
+          dataIndex: "",
+          key: 'x',
+          render: (text,record) => (
+            <Space size="large">
+              <Link to={"/edit/" + record.key}><EditFilled /></Link>
+              <a href="/"onClick={() => {this.deleteRecord(record.key);}}><DeleteFilled style={{color:red.primary}} /></a>
+            </Space>
+          )
+        }
+      ]
     };
   }
   showDrawer() {
     this.setState({setVisible:true});
   }
-
   onClose() {
     this.setState({setVisible:false});
   }
@@ -74,25 +81,23 @@ export default class RecordList extends Component {
 
   // This method will map out the users on the table
   recordList() {
-    return this.state.records.map((currentrecord) => {
+    var json = [];
+    if(this.state.records.length === 0)
+    {
+      return this.state.records;
+    }
+    this.state.records.map((currentrecord, index) => {
 
-      var json = {};
-      json.push({
+      
+      return json.push({
         "key": currentrecord._id,
         "person_name": currentrecord.person_name,
-        "person_position": currentrecord.person_name,
-        "options": <Link to={"/edit/" + currentrecord._id}>Edit</Link> | <a href="/"onClick={() => {this.deleteRecord(currentrecord._id);}}>Delete</a>
+        "person_position": currentrecord.person_position,
+        "person_level": currentrecord.person_level,
       });
-      return json;
-      /*return (<Record
-          record={currentrecord}
-          deleteRecord={this.deleteRecord}
-          key={currentrecord._id}
-        />
-      );*/
     });
+    return json;
   }
-
   // This following section will display the table with the records of individuals.
   render() {
     return (
@@ -103,10 +108,10 @@ export default class RecordList extends Component {
           Create New Record
         </Button>
         <Drawer title="Create New Record" placement="left" onClose={this.onClose} visible={this.state.setVisible}>
-          <Create/>
+          <Create handleCloseDrawer={this.onClose.bind(this)}/>
         </Drawer>
         </p>
-        <Table columns={columns} dataSource={this.recordList}/>
+        <Table columns={this.state.columns} dataSource={this.recordList()}/>
       </div>
     );
   }

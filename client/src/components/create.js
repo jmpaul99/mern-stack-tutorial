@@ -53,7 +53,10 @@ export default class Create extends Component {
 // This function will handle the submission.
   onSubmit(e) {
     //e.preventDefault();
-  
+    /*if (typeof this.props.handleCloseDrawer === 'function')
+    {
+      this.props.handleCloseDrawer().bind(this);
+    }*/
     // When post request is sent to the create url, axios will add a new record(newperson) to the database.
     const newperson = {
       person_name: this.state.person_name,

@@ -32,7 +32,7 @@ const App = () => {
       </Route>
       <Route path="/edit/:id" component={Edit} />
       <Route path="/create">
-        <Col lg={6} lg={4}>
+        <Col md={6} lg={4}>
         <h3>Create New Record</h3>
         <Create />
         </Col>
